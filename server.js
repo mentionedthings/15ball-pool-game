@@ -1,11 +1,12 @@
 // ==========================================================================
-// 15BALLPOOL PORTAL - NODE.JS CENTRAL WEBSOCKET ENGINE WITH REAL-TIME SYNC
+// 15BALLPOOL PORTAL - NODE.JS CENTRAL WEBSOCKET ENGINE WITH BULLETPROOF PATHS
 // ==========================================================================
 
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
@@ -13,21 +14,32 @@ const io = new Server(server, {
     cors: { origin: "*", methods: ["GET", "POST"] }
 });
 
-// Static public workspace folders assignment block
-app.use(express.static(path.join(__dirname, 'public')));
+// Dynamic Path Resolver: Finds public directory accurately
+const publicPath = path.join(__dirname, 'public');
 
-// Fallback routing map to entry layer point
+app.use(express.static(publicPath));
+
+// Unified Fallback Routing with Error Logger Safeguard
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    const targetFile = path.join(publicPath, 'index.html');
+    
+    if (fs.existsSync(targetFile)) {
+        res.sendFile(targetFile);
+    } else {
+        // Fallback: If folder layer is shifted, it renders direct response to prevent 404
+        res.status(200).send(`
+            <div style="text-align:center; margin-top:100px; font-family:sans-serif; color:#fff; background:#111; padding:30px; border-radius:8px; max-width:500px; margin-left:auto; margin-right:auto; border:1px solid #ffcc00;">
+                <h2 style="color:#ffcc00;">⚠️ Directory Structure Alert</h2>
+                <p>Express code loaded successfully, but your <b>public/index.html</b> file is missing inside the repository root framework!</p>
+                <p style="color:#888; font-size:0.85rem;">Ensure the 'public' folder contains index.html, game.js, and style.css lines cleanly.</p>
+            </div>
+        `);
+    }
 });
 
-// Centralized ongoing matches memory cache matrix
 const liveRoomsCache = {};
 
 io.on('connection', (socket) => {
-    console.log(`📡 Peer terminal plugged online: ${socket.id}`);
-
-    // Action A: Player executes room registration parameters initialization
     socket.on('joinMatchChannel', ({ roomId, role }) => {
         socket.join(roomId);
         socket.activeRoomId = roomId;
@@ -36,27 +48,17 @@ io.on('connection', (socket) => {
         if (!liveRoomsCache[roomId]) {
             liveRoomsCache[roomId] = { hostId: null, guestId: null, currentTurn: 1 };
         }
+        if (role === 'host') liveRoomsCache[roomId].hostId = socket.id;
+        else liveRoomsCache[roomId].guestId = socket.id;
 
-        if (role === 'host') {
-            liveRoomsCache[roomId].hostId = socket.id;
-        } else {
-            liveRoomsCache[roomId].guestId = socket.id;
-        }
-
-        console.log(`🔗 Slot registered inside room ${roomId} under identity role: ${role}`);
         io.to(roomId).emit('peerLobbyStatusAlert', liveRoomsCache[roomId]);
     });
 
-    // Action B: Transfer kinetic shot vectors and physics data layers instantly
     socket.on('broadcastKineticShotPayload', (shotDataPayload) => {
         const targetRoom = socket.activeRoomId;
-        if (targetRoom) {
-            // Emits parameters duplex directly to the listening peer computer window
-            socket.to(targetRoom).emit('syncIncomingShotPhysics', shotDataPayload);
-        }
+        if (targetRoom) socket.to(targetRoom).emit('syncIncomingShotPhysics', shotDataPayload);
     });
 
-    // Action C: Synchronize sequential data parameters upon pocket rules clearance
     socket.on('requestTurnSequenceTransition', (nextTurnData) => {
         const targetRoom = socket.activeRoomId;
         if (targetRoom && liveRoomsCache[targetRoom]) {
@@ -66,7 +68,6 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        console.log(`🔌 Peer terminal disconnected safely: ${socket.id}`);
         const targetRoom = socket.activeRoomId;
         if (targetRoom && liveRoomsCache[targetRoom]) {
             if (liveRoomsCache[targetRoom].hostId === socket.id) liveRoomsCache[targetRoom].hostId = null;
@@ -76,8 +77,7 @@ io.on('connection', (socket) => {
     });
 });
 
-// Hostinger automatic port routing pipeline detection execution environment
 const SYSTEM_PORT = process.env.PORT || 3000;
 server.listen(SYSTEM_PORT, () => {
-    console.log(`🚀 Realtime Node Server booting active on core port: ${SYSTEM_PORT}`);
+    console.log(`🚀 Node server active on: ${SYSTEM_PORT}`);
 });
