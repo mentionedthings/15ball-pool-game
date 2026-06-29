@@ -126,6 +126,7 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
+
 server.listen(PORT, () => {
-  console.log(`Pool engine executing on port ${PORT}`);
+  console.log(`Pool engine successfully executing on dynamic port: ${PORT}`);
 });
