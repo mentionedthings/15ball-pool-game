@@ -50,6 +50,22 @@ function initGame() {
   balls = {};
   gameStatus = 'aiming';
 
+  // FIX: Shifted x position from 200 to 240 to clear pocket detection bounds cleanly on boot
+  const cueBallBody = Bodies.circle(240, HEIGHT / 2, BALL_RADIUS, { 
+    restitution: 0.9, 
+    friction: 0.01, 
+    frictionAir: 0.018 
+  });
+  
+  // Reset its velocity explicitly to ensure it doesn't move on spawn
+  Matter.Body.setVelocity(cueBallBody, { x: 0, y: 0 });
+  Matter.Body.setAngularVelocity(cueBallBody, 0);
+
+  World.add(world, cueBallBody);
+  balls['cue'] = { body: cueBallBody, color: '#FFFFFF', isCue: true };
+
+  // ... (Keep your existing 15 Rack Balls loop below this exactly the same!)
+
   // Create Cue Ball with higher friction configurations
   const cueBallBody = Bodies.circle(200, HEIGHT / 2, BALL_RADIUS, { 
     restitution: 0.9, friction: 0.01, frictionAir: 0.018 
