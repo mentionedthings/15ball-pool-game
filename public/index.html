@@ -3,26 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>15BallPool Realtime Node Portal</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="stylesheet" href="style.css">
     
+    <title id="seo-title">15BallPool – Play Pool Games, Tips, Guides & Latest Updates</title>
+    <meta id="seo-description" name="description" content="15BallPool is your ultimate destination for pool games, tips, tricks, guides, and the latest updates.">
+    <meta id="seo-keywords" name="keywords" content="15BallPool, 15 Ball Pool, 8 Ball Pool, pool game, online pool game, 8 ball pool tips, pool guides, pool tricks, billiards game, pool game updates, mobile pool game, multiplayer pool game">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://15ballpool.com/">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
+   <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-W5CFQE8YHB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-W5CFQE8YHB');
+</script>
 </head>
 <body>
 
     <nav id="main-web-header">
         <div class="header-container">
-            <a href="/" class="web-logo-zone" style="text-decoration: none; color: inherit;">
+            <a href="index.html" class="web-logo-zone" style="text-decoration: none; color: inherit;">
                 <img src="logo.png" alt="15BallPool Logo" class="brand-png-logo">
             </a>
+            
             <ul class="header-menu-links">
-                <li><a href="/" class="active">Home</a></li>
+                <li><a href="index.html" class="active">Home</a></li>
                 <li><a href="page.html?view=tournaments">Tournaments</a></li>
                 <li><a href="page.html?view=leaderboard">Leaderboard</a></li>
                 <li><a href="page.html?view=how-to-play">How to Play</a></li>
             </ul>
+            
+            <div class="header-social-icons">
+                <a href="#" class="social-icon fb">🌐</a>
+                <a href="#" class="social-icon tw">🐦</a>
+                <a href="#" class="social-icon dc">💬</a>
+            </div>
         </div>
     </nav>
 
@@ -38,17 +59,17 @@
             </div>
             
             <div id="center-hud-display">
-                <div id="status-msg">Click Play Button below to connect to server stream...</div>
+                <div id="status-msg">Click Play Button below to load table canvas!</div>
                 <div id="shot-timer-box">⏱️ <span id="timer-count">20</span>s</div>
             </div>
             
             <div id="player2-card" class="player-profile">
                 <div class="meta">
-                    <span id="p2-identity" class="username">Player 2</span>
+                    <span id="p2-identity" class="username">AI Opponent</span>
                     <span id="p2-group" class="group-indicator text-muted">Open Table</span>
                     <div id="p2-rack" class="ball-pocketed-rack"></div>
                 </div>
-                <div class="avatar">👤</div>
+                <div class="avatar">🤖</div>
             </div>
         </header>
 
@@ -59,13 +80,43 @@
             </div>
 
             <div id="canvas-container" style="position: relative;">
-                <div id="game-start-splash-screen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(15, 15, 15, 0.85), rgba(5, 5, 5, 0.95)), url('logo.png') no-repeat center; background-size: contain; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px;">
-                    <h2 style="color: #ffffff; margin: 0; font-size: 1.8rem; font-weight: 800;">Realtime Tournament Workspace Channel</h2>
-                    <button onclick="launchPhaserGameEngineInstance()" style="padding: 16px 45px; background: #00ffcc; color: #000; font-size: 1.25rem; font-weight: 900; border: none; border-radius: 30px; cursor: pointer; text-transform: uppercase;">▶️ Connect & Play</button>
+                <div id="game-start-splash-screen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(15, 15, 15, 0.85), rgba(5, 5, 5, 0.95)), url('logo.png') no-repeat center; background-size: contain; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; border-radius: 4px;">
+                    <h2 style="color: #ffffff; margin: 0; font-size: 1.8rem; font-weight: 800;">Ready Master? Take the Shot!</h2>
+                    <p style="color: #00ffcc; margin: 0 0 10px 0; font-size: 0.95rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Classic 15-Ball Pool Simulation Engine</p>
+                    <button onclick="launchPhaserGameEngineInstance()" style="padding: 16px 45px; background: #00ffcc; color: #000; font-size: 1.25rem; font-weight: 900; border: none; border-radius: 30px; cursor: pointer; box-shadow: 0 8px 25px rgba(0, 255, 204, 0.4); text-transform: uppercase;">▶️ Play Game</button>
                 </div>
             </div>
+
+            <aside id="color-sidebar-board">
+                <h4 class="sidebar-title">TABLE FELT</h4>
+                <div class="color-options-grid" id="felt-color-options-wrapper">
+                    <button class="color-btn active" data-color="0x0d4216" style="background-color: #0d4216;" title="Classic Green"></button>
+                    <button class="color-btn" data-color="0x0b2f61" style="background-color: #0b2f61;" title="Royal Blue"></button>
+                    <button class="color-btn" data-color="0x1c1c1c" style="background-color: #1c1c1c;" title="Elite Black"></button>
+                    <button class="color-btn" data-color="0x7a0c0c" style="background-color: #7a0c0c;" title="Matte Crimson"></button>
+                </div>
+            </aside>
         </div>
     </div>
+
+    <footer id="main-web-footer">
+        <div class="footer-container">
+            <div class="footer-column website-details-col">
+                <h4 class="footer-col-title">About 15BallPool</h4>
+                <p class="footer-desc-text">Experience high-fidelity 2D 15-Ball pool simulation running directly inside your browser. Master angles vectors safely from desktop or mobile devices.</p>
+            </div>
+            <div class="footer-column footer-menu-col">
+                <h4 class="footer-col-title">Quick Navigation</h4>
+                <ul class="footer-menu-links">
+                    <li><a href="page.html?view=privacy">Privacy Policy</a></li>
+                    <li><a href="page.html?view=terms">Terms of Service</a></li>
+                    <li><a href="page.html?view=contact">Contact Support</a></li>
+                    <li><a href="page.html?view=api">Developer API</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-copyright-bar"><p>&copy; 2026 15BallPool Inc. All Rights Reserved. Hosted via Hostinger.</p></div>
+    </footer>
 
     <script src="game.js"></script>
 </body>
