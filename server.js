@@ -5,9 +5,7 @@ const Matter = require('matter-js');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: { origin: "*" }
-});
+const io = new Server(server, { cors: { origin: "*" } });
 
 app.use(express.static('public'));
 
@@ -24,14 +22,13 @@ const HEIGHT = 400;
 const BALL_RADIUS = 12;
 const POCKET_RADIUS = 22;
 
-// Definitive coordinates for 6 pockets
 const pockets = [
-  { x: 10, y: 10 },           // Top Left
-  { x: WIDTH / 2, y: 5 },     // Top Center
-  { x: WIDTH - 10, y: 10 },   // Top Right
-  { x: 10, y: HEIGHT - 10 },  // Bottom Left
-  { x: WIDTH / 2, y: HEIGHT - 5 }, // Bottom Center
-  { x: WIDTH - 10, y: HEIGHT - 10 } // Bottom Right
+  { x: 10, y: 10 },           
+  { x: WIDTH / 2, y: 5 },     
+  { x: WIDTH - 10, y: 10 },   
+  { x: 10, y: HEIGHT - 10 },  
+  { x: WIDTH / 2, y: HEIGHT - 5 }, 
+  { x: WIDTH - 10, y: HEIGHT - 10 } 
 ];
 
 let cushions = [
@@ -43,42 +40,30 @@ let cushions = [
 World.add(world, cushions);
 
 let balls = {};
-let gameStatus = 'aiming'; // 'aiming' or 'moving'
+let gameStatus = 'aiming';
 
 function initGame() {
-  Object.values(balls).forEach(b => World.remove(world, b.body));
+  // Completely purge the physics world to prevent memory allocation crashes
+  if (balls && Object.keys(balls).length > 0) {
+    Object.values(balls).forEach(b => {
+      if (b && b.body) World.remove(world, b.body);
+    });
+  }
   balls = {};
   gameStatus = 'aiming';
 
-  // FIX: Shifted x position from 200 to 240 to clear pocket detection bounds cleanly on boot
+  // Spawn Cue Ball safely in the kitchen area away from pocket zones
   const cueBallBody = Bodies.circle(240, HEIGHT / 2, BALL_RADIUS, { 
-    restitution: 0.9, 
-    friction: 0.01, 
-    frictionAir: 0.018 
-  });
-  
-  // Reset its velocity explicitly to ensure it doesn't move on spawn
-  Matter.Body.setVelocity(cueBallBody, { x: 0, y: 0 });
-  Matter.Body.setAngularVelocity(cueBallBody, 0);
-
-  World.add(world, cueBallBody);
-  balls['cue'] = { body: cueBallBody, color: '#FFFFFF', isCue: true };
-
-  // ... (Keep your existing 15 Rack Balls loop below this exactly the same!)
-
-  // Create Cue Ball with higher friction configurations
-  const cueBallBody = Bodies.circle(200, HEIGHT / 2, BALL_RADIUS, { 
     restitution: 0.9, friction: 0.01, frictionAir: 0.018 
   });
   World.add(world, cueBallBody);
   balls['cue'] = { body: cueBallBody, color: '#FFFFFF', isCue: true };
 
-  // Create 15 Rack Balls
+  // Rack up the 15 balls
   const startX = 550;
   const startY = HEIGHT / 2;
   let ballId = 1;
   
-  // Custom professional pool colors
   const poolColors = [
     '#FFD700', '#0000FF', '#FF0000', '#4B0082', '#FF8C00', 
     '#008000', '#8B0000', '#111111', '#FFD700', '#0000FF', 
@@ -105,31 +90,28 @@ function initGame() {
   }
 }
 
+// Safely execute init on start
 initGame();
 
-// Core Simulation Routine
 setInterval(() => {
   Engine.update(engine, 1000 / 60);
-
   let totalSpeed = 0;
 
-  // Process pocket validation and map properties
   Object.keys(balls).forEach(id => {
     const ball = balls[id];
-    const pos = ball.body.position;
+    if (!ball || !ball.body) return; // Crash protection guardrail
     
+    const pos = ball.body.position;
     totalSpeed += Math.hypot(ball.body.velocity.x, ball.body.velocity.y);
 
-    // Verify if any ball has crossed pocket event horizon
     pockets.forEach(pocket => {
       const dist = Math.hypot(pos.x - pocket.x, pos.y - pocket.y);
       if (dist < POCKET_RADIUS) {
         if (ball.isCue) {
-  // Scratch! Reset cue ball safely back to our new safe coordinates
-  Body.setPosition(ball.body, { x: 240, y: HEIGHT / 2 });
-  Body.setVelocity(ball.body, { x: 0, y: 0 });
+          // Scratch! Reset ball cleanly with zero lingering velocity
+          Body.setPosition(ball.body, { x: 240, y: HEIGHT / 2 });
+          Body.setVelocity(ball.body, { x: 0, y: 0 });
         } else {
-          // Remove potted object ball
           World.remove(world, ball.body);
           delete balls[id];
         }
@@ -137,25 +119,22 @@ setInterval(() => {
     });
   });
 
-  // Switch phase states between moving and aiming dynamically
   if (gameStatus === 'moving' && totalSpeed < 0.15) {
-    // Force complete physical rest
-    Object.values(balls).forEach(b => Body.setVelocity(b.body, { x: 0, y: 0 }));
+    Object.values(balls).forEach(b => {
+      if (b && b.body) Body.setVelocity(b.body, { x: 0, y: 0 });
+    });
     gameStatus = 'aiming';
   }
 
-  // Minimize network distribution bandwidth packages
-  const stateData = {
-    gameStatus: gameStatus,
-    balls: {}
-  };
-  
+  const stateData = { gameStatus: gameStatus, balls: {} };
   Object.keys(balls).forEach(id => {
-    stateData.balls[id] = {
-      x: balls[id].body.position.x,
-      y: balls[id].body.position.y,
-      color: balls[id].color
-    };
+    if (balls[id] && balls[id].body) {
+      stateData.balls[id] = {
+        x: balls[id].body.position.x,
+        y: balls[id].body.position.y,
+        color: balls[id].color
+      };
+    }
   });
 
   io.emit('gameState', stateData);
@@ -182,5 +161,5 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`Server processing updates on port: ${PORT}`);
+  console.log(`Server listening safely on port: ${PORT}`);
 });
