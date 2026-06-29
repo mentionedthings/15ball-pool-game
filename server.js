@@ -125,9 +125,9 @@ setInterval(() => {
       const dist = Math.hypot(pos.x - pocket.x, pos.y - pocket.y);
       if (dist < POCKET_RADIUS) {
         if (ball.isCue) {
-          // Scratch! Reset cue ball back to starting position
-          Body.setPosition(ball.body, { x: 200, y: HEIGHT / 2 });
-          Body.setVelocity(ball.body, { x: 0, y: 0 });
+  // Scratch! Reset cue ball safely back to our new safe coordinates
+  Body.setPosition(ball.body, { x: 240, y: HEIGHT / 2 });
+  Body.setVelocity(ball.body, { x: 0, y: 0 });
         } else {
           // Remove potted object ball
           World.remove(world, ball.body);
