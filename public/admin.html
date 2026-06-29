@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15BallPool - Owner Control Center & SEO Manager</title>
+    <style>
+        body {
+            margin: 0; padding: 0; background: #0c0c0c; color: #ffffff;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        #login-gate {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; background: #0f0f0f;
+        }
+        .login-box {
+            background: #181818; padding: 30px; border-radius: 12px; border: 1px solid #2b2b2b;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7); width: 100%; max-width: 360px; text-align: center;
+        }
+        .input-field {
+            width: 100%; padding: 12px; margin: 10px 0; background: #222; border: 1px solid #444;
+            color: #fff; border-radius: 6px; box-sizing: border-box; font-size: 1rem;
+        }
+        .action-btn {
+            width: 100%; padding: 12px; background: #00ffcc; border: none; color: #000;
+            font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: 0.2s;
+        }
+        .action-btn:hover { background: #00ccaa; transform: scale(1.02); }
+        
+        #dashboard-view { display: none; padding: 30px; max-width: 1200px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #222; padding-bottom: 20px; margin-bottom: 30px; }
+        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 25px; }
+        .control-card { background: #161616; border: 1px solid #282828; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .card-title { font-size: 1.1rem; color: #00ffcc; margin: 0 0 15px 0; border-left: 3px solid #00ffcc; padding-left: 10px; }
+        label { font-size: 0.85rem; color: #888; display: block; margin-top: 12px; font-weight: 600; }
+        .helper-text { font-size: 0.75rem; color: #666; margin: 2px 0 8px 0; }
+    </style>
+</head>
+<body>
+
+    <!-- 🔐 STAGE A: AUTHENTICATION GATE -->
+    <div id="login-gate">
+        <div class="login-box">
+            <h2 style="color: #00ffcc; margin-top:0;">Owner Access Portal</h2>
+            <input type="password" id="admin-passkey" class="input-field" placeholder="Enter Secure Password Token...">
+            <button onclick="verifyOwnerCredentials()" class="action-btn" style="margin-top:10px;">Verify & Unlock Board</button>
+            <p id="error-alert" style="color: #ff3333; font-size:0.85rem; margin-top:15px; display:none;">⚠️ Invalid Access Key Token!</p>
+        </div>
+    </div>
+
+    <!-- 📊 STAGE B: EXECUTIVE MANAGEMENT DASHBOARD -->
+    <div id="dashboard-view">
+        <header>
+            <div>
+                <h1 style="margin:0; font-size:1.8rem; letter-spacing:-0.5px;">15BallPool <span style="color:#00ffcc;">Control Center</span></h1>
+                <p style="margin:5px 0 0 0; color:#666; font-size:0.85rem;">Manage Website, Menus, and Search Engine Optimization</p>
+            </div>
+            <button onclick="terminateSessionLogout()" class="action-btn" style="width:auto; padding:8px 20px; background:#ff3333; color:#fff;">Secure Logout</button>
+        </header>
+
+        <div class="grid-layout">
+            <!-- Card 1: Game Mechanics Profile Tuning -->
+            <div class="control-card">
+                <h3 class="card-title">Physics & Speed Tuning</h3>
+                <label>Shot Turn Timer Limit (Seconds)</label>
+                <input type="number" id="cfg-timer" class="input-field" value="20">
+                <label>Max Shot Power Speed Cap Limit</label>
+                <input type="number" id="cfg-power" class="input-field" value="50">
+                <button onclick="persistConfigAdjustments()" class="action-btn" style="margin-top:15px;">Update Physics Profile</button>
+            </div>
+
+            <!-- Card 2: FULLY FUNCTIONAL SEO MANAGER PANEL -->
+            <div class="control-card">
+                <h3 class="card-title">🔍 Global SEO Framework Manager</h3>
+                
+                <label>Google Search Title (Meta Title)</label>
+                <input type="text" id="seo-meta-title" class="input-field" value="15BallPool Classic Pro Portal">
+                
+                <label>Site Meta Description (Google Snippet)</label>
+                <textarea id="seo-meta-desc" class="input-field" style="height: 60px; resize: none;">Play high-fidelity 2D 15-Ball pool simulation running directly inside your browser. Master angles and control vectors free.</textarea>
+                
+                <label>Meta Keywords</label>
+                <input type="text" id="seo-meta-keys" class="input-field" value="15 ball pool, billiards game, browser pool game, free pool">
+
+                <label>Website Global Language Tag</label>
+                <input type="text" id="seo-meta-lang" class="input-field" value="en">
+
+                <button onclick="persistSEOAdjustments()" class="action-btn" style="margin-top:15px; background: #00ffcc;">Publish SEO Meta Live</button>
+            </div>
+
+            <!-- Card 3: Menu Link & Navigation Manager -->
+            <div class="control-card">
+                <h3 class="card-title">Menu & Branding Manager</h3>
+                <label>Website Brand Title Name</label>
+                <input type="text" id="cfg-brand" class="input-field" value="15BallPool">
+                <label>Header Menu Links (Comma Separated)</label>
+                <input type="text" id="cfg-header-menu" class="input-field" value="Home, Tournaments, Leaderboard, How to Play">
+                <label>Footer Quick Links Menu (Comma Separated)</label>
+                <input type="text" id="cfg-footer-menu" class="input-field" value="Privacy Policy, Terms of Service, Contact Support, Developer API">
+                <button onclick="persistMenuAndBranding()" class="action-btn" style="margin-top:15px;">Save Navigation & Brand</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ENCRYPTED_OWNER_KEY_TOKEN = "admin123";
+
+        function verifyOwnerCredentials() {
+            let userFieldInput = document.getElementById('admin-passkey').value;
+            if (userFieldInput === ENCRYPTED_OWNER_KEY_TOKEN) {
+                localStorage.setItem('admin_verified_session_token', 'TRUE_AUTHORIZED');
+                document.getElementById('login-gate').style.display = 'none';
+                document.getElementById('dashboard-view').style.display = 'block';
+                loadCurrentConfigurationSnapshots();
+            } else {
+                document.getElementById('error-alert').style.display = 'block';
+            }
+        }
+
+        function loadCurrentConfigurationSnapshots() {
+            if(localStorage.getItem('sys_turn_timer')) document.getElementById('cfg-timer').value = localStorage.getItem('sys_turn_timer');
+            if(localStorage.getItem('sys_max_power')) document.getElementById('cfg-power').value = localStorage.getItem('sys_max_power');
+            if(localStorage.getItem('sys_brand_title')) document.getElementById('cfg-brand').value = localStorage.getItem('sys_brand_title');
+            if(localStorage.getItem('sys_header_menu')) document.getElementById('cfg-header-menu').value = localStorage.getItem('sys_header_menu');
+            if(localStorage.getItem('sys_footer_menu')) document.getElementById('cfg-footer-menu').value = localStorage.getItem('sys_footer_menu');
+            
+            if(localStorage.getItem('seo_title')) document.getElementById('seo-meta-title').value = localStorage.getItem('seo_title');
+            if(localStorage.getItem('seo_desc')) document.getElementById('seo-meta-desc').value = localStorage.getItem('seo_desc');
+            if(localStorage.getItem('seo_keys')) document.getElementById('seo-meta-keys').value = localStorage.getItem('seo_keys');
+            if(localStorage.getItem('seo_lang')) document.getElementById('seo-meta-lang').value = localStorage.getItem('seo_lang');
+        }
+
+        function persistConfigAdjustments() {
+            localStorage.setItem('sys_turn_timer', document.getElementById('cfg-timer').value);
+            localStorage.setItem('sys_max_power', document.getElementById('cfg-power').value);
+            alert("Physics engine adjustments persistent!");
+        }
+
+        function persistSEOAdjustments() {
+            localStorage.setItem('seo_title', document.getElementById('seo-meta-title').value);
+            localStorage.setItem('seo_desc', document.getElementById('seo-meta-desc').value);
+            localStorage.setItem('seo_keys', document.getElementById('seo-meta-keys').value);
+            localStorage.setItem('seo_lang', document.getElementById('seo-meta-lang').value);
+            alert("Success! SEO Profiles updated.");
+        }
+
+        function persistMenuAndBranding() {
+            localStorage.setItem('sys_brand_title', document.getElementById('cfg-brand').value);
+            localStorage.setItem('sys_header_menu', document.getElementById('cfg-header-menu').value);
+            localStorage.setItem('sys_footer_menu', document.getElementById('cfg-footer-menu').value);
+            alert("Navigation structural updates saved successfully!");
+        }
+
+        function terminateSessionLogout() {
+            localStorage.removeItem('admin_verified_session_token');
+            window.location.reload();
+        }
+
+        if (localStorage.getItem('admin_verified_session_token') === 'TRUE_AUTHORIZED') {
+            document.getElementById('login-gate').style.display = 'none';
+            document.getElementById('dashboard-view').style.display = 'block';
+            loadCurrentConfigurationSnapshots();
+        }
+    </script>
+</body>
+</html>
