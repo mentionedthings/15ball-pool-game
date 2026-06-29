@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time 15-Ball Pool</title>
+    <style>
+        body { background: #1a1a1a; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
+        canvas { background: #0a5c36; border: 12px solid #5c3a21; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 4px; cursor: crosshair; }
+        .controls { margin-top: 15px; }
+        button { padding: 10px 20px; font-weight: bold; cursor: pointer; background: #e74c3c; color: white; border: none; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Real-Time 15-Ball Pool</h1>
+    <canvas id="gameCanvas"></canvas>
+    <div class="controls">
+        <button id="resetBtn">Reset Rack</button>
+        <p>Click & Drag away from the white cue ball to set power and aim, then release to shoot!</p>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
